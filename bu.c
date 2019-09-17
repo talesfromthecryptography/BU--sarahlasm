@@ -192,21 +192,23 @@ void bu_mul_digit(bigunsigned *a_ptr, bigunsigned *b_ptr, uint32_t d) {
   bu_clear(&carry);
 
   bu_clear(a_ptr);
-  a_ptr->used = b_ptr->used;
+  a_ptr->used = (b_ptr->used + b_ptr->base) % BU_DIGITS;
   a_ptr->base = b_ptr->base;
   carry.used = (b_ptr->used + b_ptr->base) % BU_DIGITS;
   carry.base = b_ptr->base;
 
   uint64_t res = 0;
+  bigunsigned tmp;
+  bu_clear(&tmp);
+  tmp.used = carry.used;
 
   for (uint16_t i = 0; i < b_ptr->used + b_ptr->base; ++i) {
     res = b_ptr->digit[i + b_ptr->base] * (uint64_t)d;
-    a_ptr->digit[i + a_ptr->base] = (uint32_t)(res); //res_lo
-    carry.digit[i + a_ptr->base + 1] = (uint32_t)(res >> 32); //res_hi
+    tmp.digit[i + a_ptr->base] = (uint32_t)(res); //res_lo
+    carry.digit[i + a_ptr->base] = (uint32_t)(res >> 32); //res_hi
   }
-  a_ptr->used += b_ptr->base;
   bu_shl_ip(&carry, 32);
-  bu_add_ip(a_ptr, &carry);
+  bu_add(a_ptr, &tmp, &carry);
   return;
 
 }
@@ -219,6 +221,7 @@ void bu_mul_digit_ip(bigunsigned *a_ptr, uint32_t d) {
   bu_mul_digit(a_ptr, &tmp, d);
 }
 
+// a = b * c
 void bu_mul(bigunsigned *a_ptr, bigunsigned *b_ptr, bigunsigned *c_ptr) {
   bigunsigned carry;
   bu_clear(a_ptr);
@@ -230,6 +233,7 @@ void bu_mul(bigunsigned *a_ptr, bigunsigned *b_ptr, bigunsigned *c_ptr) {
   }
 }
 
+// a *= b
 void bu_mul_ip(bigunsigned *a_ptr, bigunsigned *b_ptr) {
   bigunsigned tmp;
   bu_clear(&tmp);

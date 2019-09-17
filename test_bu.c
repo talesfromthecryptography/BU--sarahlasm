@@ -31,7 +31,7 @@ int main() {
   bu_dbg_printf(&a);
   printf("\n");
 
-  bu_readhex(&a,"DEADBEEFDEADBEEF");
+  bu_readhex(&a,"DEADBEEFDEAD4444");
   printf("Multiply digit tests:\n");
   bu_mul_digit(&d, &a, 2);
   bu_dbg_printf(&d);
