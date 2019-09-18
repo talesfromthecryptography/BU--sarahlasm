@@ -1,3 +1,9 @@
+/**
+* Bigunsigned assignment
+* Sarah Lasman
+* 2278776
+*/
+
 #include <stdio.h>
 #include <string.h>
 
@@ -44,6 +50,8 @@ int main() {
   printf("Multiply tests:\n");
   bu_mul(&d, &a, &c);
   bu_dbg_printf(&d);
+  bu_mul_ip(&b, &c);
+  bu_dbg_printf(&b);
   bu_sqr(&d, &c);
   bu_dbg_printf(&d);
   bu_sqr_ip(&c);

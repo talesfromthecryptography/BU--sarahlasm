@@ -1,3 +1,9 @@
+/**
+* Bigunsigned assignment
+* Sarah Lasman
+* 2278776
+*/
+
 #include <string.h> // for memset, etc.
 #include <stdio.h>  // for printf
 
@@ -60,7 +66,6 @@ void bu_shl(bigunsigned* a_ptr, bigunsigned* b_ptr, uint16_t cnt)
     // Shift the appropriate number of bits (bits < 32), taking in to account the old carry
     a_ptr->digit[position % BU_DIGITS] = (b_ptr->digit[position % BU_DIGITS] << bits);
     a_ptr->digit[position % BU_DIGITS] |= old_carry;
-    // Old carry = new carry
     old_carry = new_carry;
   }
   // If you've reached the most significant word and you still have a carry:
@@ -110,7 +115,6 @@ void bu_shr(bigunsigned* a_ptr, bigunsigned* b_ptr, uint16_t cnt) {
     new_carry = (b_ptr->digit[position % BU_DIGITS] & mask) << (BU_BITS_PER_DIGIT - bits);
     // Shift the appropriate number of bits (bits < 32), taking in to account the old carry
     a_ptr->digit[position % BU_DIGITS] = (b_ptr->digit[position % BU_DIGITS] >> bits) | old_carry;
-    // Old carry = new carry
     old_carry = new_carry;
   }
 
@@ -202,6 +206,7 @@ void bu_mul_digit(bigunsigned *a_ptr, bigunsigned *b_ptr, uint32_t d) {
   bu_clear(&tmp);
   tmp.used = carry.used;
 
+  //Split into res_hi and res_lo; res_lo goes into the tmp/original array and res_hi goes into carry
   for (uint16_t i = 0; i < b_ptr->used + b_ptr->base; ++i) {
     res = b_ptr->digit[i + b_ptr->base] * (uint64_t)d;
     tmp.digit[i + a_ptr->base] = (uint32_t)(res); //res_lo
@@ -226,6 +231,8 @@ void bu_mul(bigunsigned *a_ptr, bigunsigned *b_ptr, bigunsigned *c_ptr) {
   bigunsigned carry;
   bu_clear(a_ptr);
   for (uint16_t i = 0; i < b_ptr->used; ++i) {
+    //Multiply each digit, keep track of carries
+    //This is technically nested for loops
     bu_mul_digit(&carry, c_ptr, b_ptr->digit[b_ptr->base + i]);
     uint32_t shift = ((uint32_t)i) << 5;
     bu_shl_ip(&carry, shift);
@@ -291,7 +298,6 @@ void bu_readhex(bigunsigned * a_ptr, char *s) {
   a_ptr->used = (pos>>3) + ((pos&0x7)!=0);
 }
 
-//
 void bu_dbg_printf(bigunsigned *a_ptr) {
   printf("Used %x\n", a_ptr->used);
   printf("Base %x\n", a_ptr->base);
